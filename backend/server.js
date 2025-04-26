@@ -15,6 +15,8 @@ const http = require("http");
 const helmet = require("helmet");
 
 const app = express();
+app.use(cors());
+
 const server = http.createServer(app);
 // const io = new Server(server, {
 //   cors: {
@@ -23,22 +25,22 @@ const server = http.createServer(app);
 //   },
 // });
 // Specify allowed origins
-const allowedOrigins = [
-  'https://vizintel-oy2p.vercel.app',  // Vercel production origin
-  'http://localhost:5173',            // Local development origin
-];
+// const allowedOrigins = [
+//   'https://vizintel-oy2p.vercel.app',  // Vercel production origin
+//   'http://localhost:5173',            // Local development origin
+// ];
 
-// Use CORS middleware with dynamic origin checking
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);  // Allow request if origin is in allowedOrigins
-    } else {
-      callback(new Error('Not allowed by CORS'));  // Reject requests from non-allowed origins
-    }
-  },
-  credentials: true,  // Allow credentials (cookies, authorization headers, etc.)
-}));
+// // Use CORS middleware with dynamic origin checking
+// app.use(cors({
+//   origin: function (origin, callback) {
+//     if (!origin || allowedOrigins.includes(origin)) {
+//       callback(null, true);  // Allow request if origin is in allowedOrigins
+//     } else {
+//       callback(new Error('Not allowed by CORS'));  // Reject requests from non-allowed origins
+//     }
+//   },
+//   credentials: true,  // Allow credentials (cookies, authorization headers, etc.)
+// }));
 
 
 // app.use(
