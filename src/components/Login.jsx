@@ -23,7 +23,8 @@ const Login = () => {
     setIsLoading(true);
     setMessage("");
     try {
-      const response = await axios.post("https://vizintel-xnkp.onrender.com/api/auth/login", { email, password });
+      // const response = await axios.post("https://vizintel-xnkp.onrender.com/api/auth/login", { email, password });
+      const response = await axios.post("https://vizintel-lhvt.onrender.com/api/auth/login", { email, password });
       setMessage("Login successful");
       const userData = {
         email,
