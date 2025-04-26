@@ -23,7 +23,7 @@ const Login = () => {
     setIsLoading(true);
     setMessage("");
     try {
-      // const response = await axios.post("https://vizintel-xnkp.onrender.com/api/auth/login", { email, password });
+      // const response = await axios.post("https://vizintel-lhvt.onrender.com/api/auth/login", { email, password });
       const response = await axios.post("https://vizintel-lhvt.onrender.com/api/auth/login", { email, password });
       setMessage("Login successful");
       const userData = {
@@ -47,7 +47,7 @@ const Login = () => {
     setMessage("");
     const { credential } = data;
     try {
-      const response = await axios.post("https://vizintel-xnkp.onrender.com/auth/google", { token: credential });
+      const response = await axios.post("https://vizintel-lhvt.onrender.com/auth/google", { token: credential });
       setMessage("Login successful");
       const userData = {
         email: response.data.email,

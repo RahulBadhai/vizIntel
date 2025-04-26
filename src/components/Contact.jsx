@@ -20,7 +20,7 @@ const Contact = () => {
 
     const fetchTickets = async () => {
       try {
-        const res = await fetch(`https://vizintel-xnkp.onrender.com/api/support/${userId}`, {
+        const res = await fetch(`https://vizintel-lhvt.onrender.com/api/support/${userId}`, {
           credentials: "include",
         });
         if (!res.ok) throw new Error("Failed to fetch tickets");
@@ -42,7 +42,7 @@ const Contact = () => {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch("https://vizintel-xnkp.onrender.com/api/support", {
+      const response = await fetch("https://vizintel-lhvt.onrender.com/api/support", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, message }),

@@ -20,7 +20,7 @@ const ManageUsers = () => {
     setLoading(true);
     setMessage("");
     try {
-      const response = await axios.get("https://vizintel-xnkp.onrender.com/api/user/profile", {
+      const response = await axios.get("https://vizintel-lhvt.onrender.com/api/user/profile", {
         params: {
           email: searchQuery.email.toLowerCase(),
           name: searchQuery.name.toLowerCase(),
@@ -48,7 +48,7 @@ const ManageUsers = () => {
     setMessage("");
     try {
       const response = await axios.put(
-        `https://vizintel-xnkp.onrender.com/api/user/manage?email=${email}`,
+        `https://vizintel-lhvt.onrender.com/api/user/manage?email=${email}`,
         { suspend: !currentStatus },
         { withCredentials: true }
       );
@@ -74,7 +74,7 @@ const ManageUsers = () => {
     setMessage("");
     try {
       const response = await axios.put(
-        `https://vizintel-xnkp.onrender.com/api/user/manage?email=${email}`,
+        `https://vizintel-lhvt.onrender.com/api/user/manage?email=${email}`,
         updateData[userId],
         { withCredentials: true }
       );

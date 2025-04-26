@@ -18,7 +18,7 @@ const UserSearch = () => {
       if (email) query.append("email", email);
       if (name) query.append("name", name);
 
-      const response = await axios.get(`https://vizintel-xnkp.onrender.com/api/getusers?${query.toString()}`);
+      const response = await axios.get(`https://vizintel-lhvt.onrender.com/api/getusers?${query.toString()}`);
       setUsers(response.data);
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong");

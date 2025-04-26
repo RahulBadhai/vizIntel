@@ -12,7 +12,7 @@ import { motion } from "framer-motion";
 
 axios.defaults.withCredentials = true;
 
-const socket = io("https://vizintel-xnkp.onrender.com", { transports: ["websocket"] });
+const socket = io("https://vizintel-lhvt.onrender.com", { transports: ["websocket"] });
 
 const ManualDataEntryPage = () => {
   const navigate = useNavigate();
@@ -63,7 +63,7 @@ const ManualDataEntryPage = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get("https://vizintel-xnkp.onrender.com/api/data");
+      const response = await axios.get("https://vizintel-lhvt.onrender.com/api/data");
       setUserData(response.data);
       if (response.data.length > 0) {
         const latestData = response.data[response.data.length - 1];
@@ -87,7 +87,7 @@ const ManualDataEntryPage = () => {
       return;
     }
     try {
-      const response = await axios.post("https://vizintel-xnkp.onrender.com/api/data/manual", { data: dataToSend, fileName: manualFileName.trim() });
+      const response = await axios.post("https://vizintel-lhvt.onrender.com/api/data/manual", { data: dataToSend, fileName: manualFileName.trim() });
       const newData = { data: response.data.data, fileName: response.data.fileName, createdAt: new Date(), _id: response.data._id };
       setUserData((prev) => [...prev, newData]);
       setCurrentData(newData);
@@ -105,7 +105,7 @@ const ManualDataEntryPage = () => {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.put(`https://vizintel-xnkp.onrender.com/api/data/${editDataId}`, { data: editData });
+      const response = await axios.put(`https://vizintel-lhvt.onrender.com/api/data/${editDataId}`, { data: editData });
       const updatedData = { data: response.data.data, fileName: response.data.fileName, createdAt: new Date(), _id: editDataId };
       setUserData((prev) => prev.map((item) => (item._id === editDataId ? updatedData : item)));
       setCurrentData(updatedData);
@@ -119,7 +119,7 @@ const ManualDataEntryPage = () => {
 
   const handleDeleteData = async (id) => {
     try {
-      await axios.delete(`https://vizintel-xnkp.onrender.com/api/data/${id}`);
+      await axios.delete(`https://vizintel-lhvt.onrender.com/api/data/${id}`);
       setUserData((prev) => prev.filter((item) => item._id !== id));
       if (currentData?._id === id) setCurrentData(null);
       setErrorMessage("");

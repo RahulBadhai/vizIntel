@@ -12,14 +12,14 @@ const UserUploads = () => {
       try {
         setError("");
         // Fetch all users
-        const usersRes = await fetch("https://vizintel-xnkp.onrender.com/api/users", {
+        const usersRes = await fetch("https://vizintel-lhvt.onrender.com/api/users", {
           credentials: "include",
         });
         if (!usersRes.ok) throw new Error("Failed to fetch users");
         const users = await usersRes.json();
 
         // Fetch all data entries
-        const dataRes = await fetch("https://vizintel-xnkp.onrender.com/api/data/all", {
+        const dataRes = await fetch("https://vizintel-lhvt.onrender.com/api/data/all", {
           credentials: "include",
         });
         if (!dataRes.ok) throw new Error("Failed to fetch data");

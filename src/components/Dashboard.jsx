@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 axios.defaults.withCredentials = true;
 
-const socket = io("https://vizintel-xnkp.onrender.com", { transports: ["websocket"] });
+const socket = io("https://vizintel-lhvt.onrender.com", { transports: ["websocket"] });
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -53,7 +53,7 @@ const Dashboard = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get("https://vizintel-xnkp.onrender.com/api/data");
+      const response = await axios.get("https://vizintel-lhvt.onrender.com/api/data");
       setUserData(response.data);
       setFilteredData(response.data);
       updateStats(response.data);
@@ -118,7 +118,7 @@ const Dashboard = () => {
 
   const handleDeleteData = async (id) => {
     try {
-      await axios.delete(`https://vizintel-xnkp.onrender.com/api/data/${id}`);
+      await axios.delete(`https://vizintel-lhvt.onrender.com/api/data/${id}`);
       setUserData((prev) => prev.filter((item) => item._id !== id));
       setFilteredData((prev) => prev.filter((item) => item._id !== id));
       updateStats(userData.filter((item) => item._id !== id));
@@ -138,7 +138,7 @@ const Dashboard = () => {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.put(`https://vizintel-xnkp.onrender.com/api/data/${editDataId}`, { data: editData });
+      const response = await axios.put(`https://vizintel-lhvt.onrender.com/api/data/${editDataId}`, { data: editData });
       const updatedData = { data: response.data.data, fileName: response.data.fileName, createdAt: new Date(), _id: editDataId };
       setUserData((prev) => prev.map((item) => (item._id === editDataId ? updatedData : item)));
       setFilteredData((prev) => prev.map((item) => (item._id === editDataId ? updatedData : item)));

@@ -19,13 +19,13 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchCounts = async () => {
       try {
-        const userRes = await fetch("https://vizintel-xnkp.onrender.com/api/users/count", {
+        const userRes = await fetch("https://vizintel-lhvt.onrender.com/api/users/count", {
           credentials: "include",
         });
         const userData = await userRes.json();
         setUserCount(userData.totalUsers);
 
-        const dataRes = await fetch("https://vizintel-xnkp.onrender.com/api/datas/count", {
+        const dataRes = await fetch("https://vizintel-lhvt.onrender.com/api/datas/count", {
           credentials: "include",
         });
         const dataData = await dataRes.json();
@@ -37,7 +37,7 @@ const AdminDashboard = () => {
 
     const fetchTickets = async () => {
       try {
-        const res = await fetch("https://vizintel-xnkp.onrender.com/api/support/admin", {
+        const res = await fetch("https://vizintel-lhvt.onrender.com/api/support/admin", {
           credentials: "include",
         });
         const data = await res.json();
@@ -51,7 +51,7 @@ const AdminDashboard = () => {
 
     const fetchAllDatasets = async () => {
       try {
-        const res = await fetch("https://vizintel-xnkp.onrender.com/api/data", {
+        const res = await fetch("https://vizintel-lhvt.onrender.com/api/data", {
           credentials: "include",
         });
         if (!res.ok) {
@@ -67,7 +67,7 @@ const AdminDashboard = () => {
 
     const fetchTrafficData = async () => {
       try {
-        const res = await fetch("https://vizintel-xnkp.onrender.com/api/traffic/week", {
+        const res = await fetch("https://vizintel-lhvt.onrender.com/api/traffic/week", {
           credentials: "include",
         });
         if (!res.ok) throw new Error("Failed to fetch traffic data");
@@ -88,7 +88,7 @@ const AdminDashboard = () => {
   const updateStatus = async (ticketId, newStatus) => {
     try {
       const response = await fetch(
-        `https://vizintel-xnkp.onrender.com/api/support/${ticketId}`,
+        `https://vizintel-lhvt.onrender.com/api/support/${ticketId}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -113,7 +113,7 @@ const AdminDashboard = () => {
 
   const deleteDataset = async (id) => {
     try {
-      const res = await fetch(`https://vizintel-xnkp.onrender.com/api/data/${id}`, {
+      const res = await fetch(`https://vizintel-lhvt.onrender.com/api/data/${id}`, {
         method: "DELETE",
         credentials: "include",
       });

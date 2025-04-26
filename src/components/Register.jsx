@@ -22,7 +22,7 @@ const Register = () => {
     setIsLoading(true);
     setMessage("");
     try {
-      const response = await axios.post("https://vizintel-xnkp.onrender.com/api/auth/register", {
+      const response = await axios.post("https://vizintel-lhvt.onrender.com/api/auth/register", {
         name,
         email,
         password,
@@ -46,7 +46,7 @@ const Register = () => {
     setMessage("");
     const { credential } = data;
     try {
-      const response = await axios.post("https://vizintel-xnkp.onrender.com/auth/google", { token: credential });
+      const response = await axios.post("https://vizintel-lhvt.onrender.com/auth/google", { token: credential });
       setMessage("Registration successful");
       setTimeout(() => navigate("/dashboard", { replace: true }), 500);
     } catch (error) {

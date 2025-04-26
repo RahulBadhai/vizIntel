@@ -23,7 +23,7 @@ const AdminLogin = () => {
     setIsLoading(true);
     setMessage("");
     try {
-      const response = await axios.post("https://vizintel-xnkp.onrender.com/api/auth/superadminlogin", { email, password });
+      const response = await axios.post("https://vizintel-lhvt.onrender.com/api/auth/superadminlogin", { email, password });
       setMessage("Login successful");
       const adminData = {
         email,
@@ -46,7 +46,7 @@ const AdminLogin = () => {
     setMessage("");
     const { credential } = data;
     try {
-      const response = await axios.post("https://vizintel-xnkp.onrender.com/adminAuth/google", { token: credential });
+      const response = await axios.post("https://vizintel-lhvt.onrender.com/adminAuth/google", { token: credential });
       setMessage("Login successful");
       const adminData = {
         email: response.data.email,
