@@ -15,15 +15,27 @@ const http = require("http");
 const helmet = require("helmet");
 
 const app = express();
-app.use(cors());
+const corsOptions = {
+  origin: "https://viz-intel.vercel.app", // your frontend URL
+  credentials: true, // allow credentials (cookies, auth headers, etc.)
+};
 
+app.use(cors(corsOptions));
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: "https://viz-intel.vercel.app",
     methods: ["GET", "POST"],
+    credentials: true,
   },
 });
+
+// const io = new Server(server, {
+//   cors: {
+//     origin: "http://localhost:5173",
+//     methods: ["GET", "POST"],
+//   },
+// });
 // Specify allowed origins
 // const allowedOrigins = [
 //   'https://vizintel-oy2p.vercel.app',  // Vercel production origin
@@ -41,7 +53,6 @@ const io = new Server(server, {
 //   },
 //   credentials: true,  // Allow credentials (cookies, authorization headers, etc.)
 // }));
-
 
 // app.use(
 //   helmet({
@@ -110,7 +121,11 @@ const Data = mongoose.model("Data", dataSchema);
 const supportTicketSchema = new mongoose.Schema({
   userId: { type: String, required: true },
   message: { type: String, required: true },
-  status: { type: String, enum: ["Pending", "Resolved", "Rejected"], default: "Pending" },
+  status: {
+    type: String,
+    enum: ["Pending", "Resolved", "Rejected"],
+    default: "Pending",
+  },
   createdAt: { type: Date, default: Date.now },
 });
 const SupportTicket = mongoose.model("SupportTicket", supportTicketSchema);
@@ -124,7 +139,8 @@ const upload = multer({
   storage,
   fileFilter: (req, file, cb) => {
     if (
-      file.mimetype === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+      file.mimetype ===
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
       file.mimetype === "application/vnd.ms-excel"
     ) {
       cb(null, true);
@@ -145,7 +161,9 @@ const authenticateToken = (req, res, next) => {
       if (err.name === "TokenExpiredError") {
         return res.status(403).json({ message: "Token expired" });
       }
-      return res.status(403).json({ message: "Invalid token", error: err.message });
+      return res
+        .status(403)
+        .json({ message: "Invalid token", error: err.message });
     }
     req.user = decoded;
     next();
@@ -202,7 +220,13 @@ app.post("/api/auth/register", async (req, res) => {
     let user = await User.findOne({ email });
     if (user) return res.status(400).json({ message: "User already exists" });
     const hashedPassword = await bcrypt.hash(password, 10);
-    user = new User({ name, email, password: hashedPassword, schoolName, authType: "manual" });
+    user = new User({
+      name,
+      email,
+      password: hashedPassword,
+      schoolName,
+      authType: "manual",
+    });
     await user.save();
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
@@ -216,10 +240,14 @@ app.post("/api/auth/login", async (req, res) => {
   try {
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "Invalid credentials" });
-    if (user.isSuspended) return res.status(403).json({ message: "Account suspended" });
+    if (user.isSuspended)
+      return res.status(403).json({ message: "Account suspended" });
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    if (!isMatch)
+      return res.status(400).json({ message: "Invalid credentials" });
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
     res.cookie("authToken", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -246,9 +274,17 @@ app.post("/api/auth/superadminregister", async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
     let superAdmin = await SuperAdmin.findOne({ email });
-    if (superAdmin) return res.status(400).json({ message: "Admin already exists" });
+    if (superAdmin)
+      return res.status(400).json({ message: "Admin already exists" });
     const hashedPassword = await bcrypt.hash(password, 10);
-    superAdmin = new SuperAdmin({ name, identity: 1, email, password: hashedPassword, schoolName, authType: "manual" });
+    superAdmin = new SuperAdmin({
+      name,
+      identity: 1,
+      email,
+      password: hashedPassword,
+      schoolName,
+      authType: "manual",
+    });
     await superAdmin.save();
     res.status(201).json({ message: "SuperAdmin registered successfully" });
   } catch (error) {
@@ -261,11 +297,18 @@ app.post("/api/auth/superadminlogin", async (req, res) => {
   const { email, password } = req.body;
   try {
     const superAdmin = await SuperAdmin.findOne({ email });
-    if (!superAdmin) return res.status(400).json({ message: "Invalid credentials" });
-    if (superAdmin.isSuspended) return res.status(403).json({ message: "Account suspended" });
+    if (!superAdmin)
+      return res.status(400).json({ message: "Invalid credentials" });
+    if (superAdmin.isSuspended)
+      return res.status(403).json({ message: "Account suspended" });
     const isMatch = await bcrypt.compare(password, superAdmin.password);
-    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
-    const token = jwt.sign({ userId: superAdmin._id, role: "superadmin" }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    if (!isMatch)
+      return res.status(400).json({ message: "Invalid credentials" });
+    const token = jwt.sign(
+      { userId: superAdmin._id, role: "superadmin" },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
     res.cookie("authToken", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -288,16 +331,26 @@ app.post("/api/auth/superadminlogin", async (req, res) => {
 app.post("/auth/google", async (req, res) => {
   try {
     const { token } = req.body;
-    const googleResponse = await axios.get(`https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${token}`);
+    const googleResponse = await axios.get(
+      `https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${token}`
+    );
     const { email, name } = googleResponse.data;
     let user = await User.findOne({ email });
     if (!user) {
-      user = new User({ name, email, password: "ef45de35690ecdd11d6b8dca52657144", schoolName: "test", authType: "google" });
+      user = new User({
+        name,
+        email,
+        password: "ef45de35690ecdd11d6b8dca52657144",
+        schoolName: "test",
+        authType: "google",
+      });
       await user.save();
     } else if (user.isSuspended) {
       return res.status(403).json({ message: "Account suspended" });
     }
-    const authToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    const authToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
     res.cookie("authToken", authToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -320,7 +373,9 @@ app.post("/auth/google", async (req, res) => {
 app.post("/adminAuth/google", async (req, res) => {
   try {
     const { token } = req.body;
-    const googleResponse = await axios.get(`https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${token}`);
+    const googleResponse = await axios.get(
+      `https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${token}`
+    );
     const { email, name } = googleResponse.data;
     let superAdmin = await SuperAdmin.findOne({ email });
     if (!superAdmin) {
@@ -336,7 +391,11 @@ app.post("/adminAuth/google", async (req, res) => {
     } else if (superAdmin.isSuspended) {
       return res.status(403).json({ message: "Account suspended" });
     }
-    const authToken = jwt.sign({ userId: superAdmin._id, role: "superadmin" }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    const authToken = jwt.sign(
+      { userId: superAdmin._id, role: "superadmin" },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
     res.cookie("authToken", authToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -384,7 +443,11 @@ app.put("/api/user/manage", async (req, res) => {
       return res.status(404).json({ message: "No users found" });
     }
     if (users.length > 1) {
-      return res.status(400).json({ message: "Multiple users found; please specify a unique email" });
+      return res
+        .status(400)
+        .json({
+          message: "Multiple users found; please specify a unique email",
+        });
     }
     const user = users[0];
     if (newPassword) user.password = await bcrypt.hash(newPassword, 10);
@@ -399,28 +462,44 @@ app.put("/api/user/manage", async (req, res) => {
 });
 
 // Excel Upload Route
-app.post("/api/data/upload", authenticateToken, upload.single("excel"), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
+app.post(
+  "/api/data/upload",
+  authenticateToken,
+  upload.single("excel"),
+  async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+      const filePath = req.file.path;
+      const workbook = XLSX.readFile(filePath);
+      const sheetName = workbook.SheetNames[0];
+      const data = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+      const newData = new Data({
+        userId: req.user.userId,
+        data,
+        fileName: req.file.originalname,
+      });
+      await newData.save();
+      io.to(req.user.userId.toString()).emit("dataUpdate", {
+        userId: req.user.userId,
+        data,
+        fileName: req.file.originalname,
+        _id: newData._id,
+      });
+      res.json({
+        message: "Excel data uploaded successfully",
+        data,
+        fileName: req.file.originalname,
+        _id: newData._id,
+      });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Error uploading Excel", error: error.message });
     }
-    const filePath = req.file.path;
-    const workbook = XLSX.readFile(filePath);
-    const sheetName = workbook.SheetNames[0];
-    const data = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
-    const newData = new Data({ userId: req.user.userId, data, fileName: req.file.originalname });
-    await newData.save();
-    io.to(req.user.userId.toString()).emit("dataUpdate", {
-      userId: req.user.userId,
-      data,
-      fileName: req.file.originalname,
-      _id: newData._id,
-    });
-    res.json({ message: "Excel data uploaded successfully", data, fileName: req.file.originalname, _id: newData._id });
-  } catch (error) {
-    res.status(500).json({ message: "Error uploading Excel", error: error.message });
   }
-});
+);
 
 // Manual Data Entry Route
 app.post("/api/data/manual", authenticateToken, async (req, res) => {
@@ -429,7 +508,11 @@ app.post("/api/data/manual", authenticateToken, async (req, res) => {
     if (!data || !Array.isArray(data) || data.length === 0) {
       return res.status(400).json({ message: "Invalid data format" });
     }
-    const newData = new Data({ userId: req.user.userId, data, fileName: "Manual Entry" });
+    const newData = new Data({
+      userId: req.user.userId,
+      data,
+      fileName: "Manual Entry",
+    });
     await newData.save();
     io.to(req.user.userId.toString()).emit("dataUpdate", {
       userId: req.user.userId,
@@ -437,9 +520,16 @@ app.post("/api/data/manual", authenticateToken, async (req, res) => {
       fileName: "Manual Entry",
       _id: newData._id,
     });
-    res.json({ message: "Manual data added successfully", data, fileName: "Manual Entry", _id: newData._id });
+    res.json({
+      message: "Manual data added successfully",
+      data,
+      fileName: "Manual Entry",
+      _id: newData._id,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Error adding manual data", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error adding manual data", error: error.message });
   }
 });
 
@@ -449,7 +539,9 @@ app.get("/api/data", authenticateToken, async (req, res) => {
     const userData = await Data.find({ userId: req.user.userId });
     res.json(userData);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching data", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error fetching data", error: error.message });
   }
 });
 
@@ -461,7 +553,10 @@ app.put("/api/data/:id", authenticateToken, async (req, res) => {
     if (!data || !Array.isArray(data)) {
       return res.status(400).json({ message: "Invalid data format" });
     }
-    const existingData = await Data.findOne({ _id: id, userId: req.user.userId });
+    const existingData = await Data.findOne({
+      _id: id,
+      userId: req.user.userId,
+    });
     if (!existingData) {
       return res.status(404).json({ message: "Data not found" });
     }
@@ -474,9 +569,15 @@ app.put("/api/data/:id", authenticateToken, async (req, res) => {
       fileName: existingData.fileName,
       _id: existingData._id,
     });
-    res.json({ message: "Data updated successfully", data, fileName: existingData.fileName });
+    res.json({
+      message: "Data updated successfully",
+      data,
+      fileName: existingData.fileName,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Error updating data", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error updating data", error: error.message });
   }
 });
 
@@ -491,7 +592,9 @@ app.delete("/api/data/:id", authenticateToken, async (req, res) => {
     await Data.deleteOne({ _id: id });
     res.json({ message: "Data deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Error deleting data", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error deleting data", error: error.message });
   }
 });
 
@@ -540,11 +643,18 @@ app.post("/api/support", async (req, res) => {
   try {
     const { userId, message } = req.body;
     if (!userId || !message) {
-      return res.status(400).json({ error: "User ID and message are required" });
+      return res
+        .status(400)
+        .json({ error: "User ID and message are required" });
     }
     const newTicket = new SupportTicket({ userId, message });
     await newTicket.save();
-    res.status(201).json({ message: "Support ticket created successfully", ticket: newTicket });
+    res
+      .status(201)
+      .json({
+        message: "Support ticket created successfully",
+        ticket: newTicket,
+      });
   } catch (error) {
     res.status(500).json({ error: "Server error" });
   }
@@ -594,7 +704,9 @@ app.put("/api/support/:ticketId", async (req, res) => {
 // Delete Support Ticket (Admin)
 app.delete("/api/support/:ticketId", async (req, res) => {
   try {
-    const deletedTicket = await SupportTicket.findByIdAndDelete(req.params.ticketId);
+    const deletedTicket = await SupportTicket.findByIdAndDelete(
+      req.params.ticketId
+    );
     if (!deletedTicket) {
       return res.status(404).json({ error: "Ticket not found" });
     }
@@ -665,7 +777,6 @@ io.on("connection", (socket) => {
   });
   socket.on("disconnect", () => console.log("User disconnected:", socket.id));
 });
-
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
